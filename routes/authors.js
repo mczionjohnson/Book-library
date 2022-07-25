@@ -116,25 +116,27 @@ router.delete('/:id', async (req, res) => {
     try {
 
         author = await Author.findById(req.params.id)
-        books = await Book.find({ author : author.id })
+        books = await Book.find({ author : author })
+        if (books == '') {
+            await author.remove()
+            res.redirect('/authors')
+        } else {
+            // console.log(`${books}` )   
+            res.render('authors/show', {
+            author: author,
+            booksByAuthor: books,
+            errorMessage: 'Author has one or more books registered'
+            })
+        }
 
-        await author.remove()
-        res.redirect('/authors')
 
     } catch {
         if ( author == null) 
         {
             res.redirect('/')
-        } else {
-        //     res.redirect(`/authors/${author.id}`)
-        // }
-            res.render('authors/show', {
-                author: author,
-                booksByAuthor: books,
-                errorMessage: 'Author has one or more books registered'
-            })
-        }
+        } 
     }
 })
+
 
 module.exports = router
